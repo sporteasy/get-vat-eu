@@ -3,6 +3,7 @@
 #
 """The main file."""
 
+import re
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (CannotGetAnyRelevantInformation, VatNotValid, AddressStringNotCorrespondingToExpectedFormat)
 
@@ -26,8 +27,10 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     return response
 
 
-def parse_address_string(address_string: str, country_code: str):
+def parse_address_string(address_string: str, country_code: str, strict:bool = False):
     r"""Get relevant information from the address string.
+    :param strict: check that every aspect of the address string
+        corresponds to the expected input.
 
 
     .. note:: From empirical evidence, an address string is structured like this:
@@ -45,24 +48,28 @@ def parse_address_string(address_string: str, country_code: str):
 
             # The address part is the first substring. Remove spaces around the string borders.
             address_substring = buf[0].strip(countries['IT']['address string']['delimiter'])
+
             # Postal code, city, province.
             pc_cty_prv_substring = buf[1]
 
             # Get the other substring into its various components
             buf = pc_cty_prv_substring.split(countries['IT']['address string']['delimiter'])
 
+            # We expect at least 3 elements: postal code, province and city.
+            if strict and len(buf) < 3:
+                raise AddressStringNotCorrespondingToExpectedFormat
+
             # We know that province and postal code are not composed by delimiters.
             postal_code = buf[0]
             province = buf[-1]
-            # A city might contain spaces.
+            # A city might contain spaces (delimiters).
             city = countries['IT']['address string']['delimiter'].join(buf[1:-1])
-
 
             # Check that the province is composed of 2 uppercase letter characters.
             # Check that the postal code correponds to the standard.
-            # if not: raise
-            #
-
+            if strict and (not re.match("^\d{5}", postal_code)
+                or not re.match("^[A-Z]{2}$", province)):
+                raise AddressStringNotCorrespondingToExpectedFormat
 
             trader_information['address'] = address_substring
             trader_information['postal code'] = postal_code
@@ -94,6 +101,8 @@ def parse_response(response: dict):
     assert 'traderCityMatch' in reponse
     assert 'requestIdentifier' in reponse
 
+
+    # Return trader name as well
 
     trader_information = dict()
 
