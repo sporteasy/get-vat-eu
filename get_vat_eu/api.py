@@ -52,8 +52,9 @@ def parse_address_string(address_string: str, country_code: str, strict:bool = F
             # Postal code, city, province.
             pc_cty_prv_substring = buf[1]
 
-            # Get the other substring into its various components
-            buf = pc_cty_prv_substring.split(countries['IT']['address string']['delimiter'])
+            # Get the other substring into its various components.
+            # Always be tolerant with the delimiters on the borders.
+            buf = pc_cty_prv_substring.strip(countries['IT']['address string']['delimiter']).split(countries['IT']['address string']['delimiter'])
 
             # We expect at least 3 elements: postal code, province and city.
             if strict and len(buf) < 3:
@@ -63,7 +64,8 @@ def parse_address_string(address_string: str, country_code: str, strict:bool = F
             postal_code = buf[0]
             province = buf[-1]
             # A city might contain spaces (delimiters).
-            city = countries['IT']['address string']['delimiter'].join(buf[1:-1])
+            # Always be tolerant with the delimiters on the borders.
+            city = countries['IT']['address string']['delimiter'].join(buf[1:-1]).strip(countries['IT']['address string']['delimiter'])
 
             # Check that the province is composed of 2 uppercase letter characters.
             # Check that the postal code correponds to the standard.
