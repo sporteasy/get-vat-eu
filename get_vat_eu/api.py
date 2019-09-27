@@ -4,6 +4,7 @@
 """The main file."""
 
 import re
+import zeep
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (CannotGetAnyRelevantInformation, VatNotValid, AddressStringNotCorrespondingToExpectedFormat)
 
@@ -22,7 +23,10 @@ from .exceptions import (CannotGetAnyRelevantInformation, VatNotValid, AddressSt
 def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
     r"""Make a SOAP request and expect a response."""
 
-    response = None
+    # FIXME use variable in the constants file.
+    URL = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
+    client = zeep.Client(URL)
+    response = client.service.checkVatApprox(country_code, vat_number)
 
     return response
 
@@ -54,10 +58,13 @@ def parse_address_string(address_string: str, country_code: str, strict:bool = F
 
             # Get the other substring into its various components.
             # Always be tolerant with the delimiters on the borders.
-            buf = pc_cty_prv_substring.strip(countries['IT']['address string']['delimiter']).split(countries['IT']['address string']['delimiter'])
+            # Remove empty substrings in case of unexpected address string formats.
+            buf = list(filter(None,
+                pc_cty_prv_substring.strip(
+                    countries['IT']['address string']['delimiter']).split(countries['IT']['address string']['delimiter'])))
 
             # We expect at least 3 elements: postal code, province and city.
-            if strict and len(buf) < 3:
+            if len(buf) < 3:
                 raise AddressStringNotCorrespondingToExpectedFormat
 
             # We know that province and postal code are not composed by delimiters.

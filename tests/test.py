@@ -48,8 +48,14 @@ IT_SIMPLE_VAT_STRICT_NOT_VALID_POSTAL_CODE_CASE = (IT_SIMPLE_VAT_EXPECTED_ADDRES
 IT_SIMPLE_VAT_STRICT_NOT_VALID_PROVINCE_CASE = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
                                 + ' ' + IT_SIMPLE_VAT_EXPECTED_CITY + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE[:-1] + '\n')
 
-IT_SIMPLE_VAT_ADDRESS_STRING = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
-                                + ' ' + IT_SIMPLE_VAT_EXPECTED_CITY + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE + '\n')
+IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_POSTAL_CODE = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + ' '
+                                + IT_SIMPLE_VAT_EXPECTED_CITY + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE + '\n')
+
+IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_CITY = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
+                                + ' ' + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE + '\n')
+
+IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_PROVINCE = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
+                                + ' ' + IT_SIMPLE_VAT_EXPECTED_CITY + ' ' + '\n')
 
 class TestApi(unittest.TestCase):
     r"""Test the main API."""
@@ -92,3 +98,22 @@ class TestApi(unittest.TestCase):
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             self.assertEqual(api.parse_address_string(IT_SIMPLE_VAT_STRICT_NOT_VALID_PROVINCE_CASE, DEFAULT_COUNTRY, strict=True), expected_simple_patch)
 
+        # No postal code.
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_POSTAL_CODE, DEFAULT_COUNTRY)
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_POSTAL_CODE, DEFAULT_COUNTRY, strict=True)
+
+        # No city.
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_CITY, DEFAULT_COUNTRY)
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_CITY, DEFAULT_COUNTRY, strict=True)
+
+        # No province.
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_PROVINCE, DEFAULT_COUNTRY)
+        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_PROVINCE, DEFAULT_COUNTRY, strict=True)
+
+        # City with spaces: Repeat every test.
