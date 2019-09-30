@@ -121,21 +121,19 @@ class TestApi(unittest.TestCase):
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             api.parse_address_string(BASE_ADDRESS_STRING_MISSING_BOTH_DELIMITERS, COUNTRY_CODE, strict=True)
 
-        # Postal code not conforming case.
         expected_base_patch = copy.copy(expected_base)
         expected_base_patch['postal code'] = BASE_EXPECTED_POSTAL_CODE[:-1]
         self.assertEqual(api.parse_address_string(BASE_ADDRESS_STRING_POSTAL_CODE_NOT_CONFORMING, DEFAULT_COUNTRY), expected_base_patch)
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             self.assertEqual(api.parse_address_string(BASE_ADDRESS_STRING_POSTAL_CODE_NOT_CONFORMING, DEFAULT_COUNTRY, strict=True), expected_simple_patch)
 
-        """
-        # Province name not conforming case.
-        expected_simple_patch = copy.copy(expected_simple)
-        expected_simple_patch['province'] = IT_SIMPLE_VAT_EXPECTED_PROVINCE[:-1]
-        self.assertEqual(api.parse_address_string(IT_SIMPLE_VAT_STRICT_NOT_VALID_PROVINCE_CASE, DEFAULT_COUNTRY), expected_simple_patch)
+        expected_base_patch = copy.copy(expected_base)
+        expected_base_patch['province'] = BASE_EXPECTED_PROVINCE[:-1]
+        self.assertEqual(api.parse_address_string(BASE_ADDRESS_STRING_PROVINCE_NOT_CONFORMING, DEFAULT_COUNTRY), expected_base_patch)
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            self.assertEqual(api.parse_address_string(IT_SIMPLE_VAT_STRICT_NOT_VALID_PROVINCE_CASE, DEFAULT_COUNTRY, strict=True), expected_simple_patch)
+            self.assertEqual(api.parse_address_string(BASE_ADDRESS_STRING_PROVINCE_NOT_CONFORMING, DEFAULT_COUNTRY, strict=True), expected_simple_patch)
 
+        """
         # No postal code.
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_POSTAL_CODE, DEFAULT_COUNTRY)
