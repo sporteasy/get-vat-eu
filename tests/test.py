@@ -57,6 +57,18 @@ IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_CITY = (IT_SIMPLE_VAT_EXPECTED_ADDRESS
 IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_PROVINCE = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
                                 + ' ' + IT_SIMPLE_VAT_EXPECTED_CITY + ' ' + '\n')
 
+# City with spaces.
+IT_VAT_EXPECTED_CITY_WITH_SPACES = 'MALBORGHETTO DI BOARA'
+IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
+                                + ' ' + IT_VAT_EXPECTED_CITY_WITH_SPACES + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE + '\n')
+
+IT_CITY_WITH_SPACES_VAT_EXPECTED_CITY_WITH_SPACES_S10 = S10 + 'MALBORGHETTO DI BOARA' + S10
+IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_S10 = (IT_SIMPLE_VAT_EXPECTED_ADDRESS_S10 + '\n' + ' ' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE_S10
+                                + ' ' + IT_CITY_WITH_SPACES_VAT_EXPECTED_CITY_WITH_SPACES_S10 + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE_S10 + '\n')
+
+IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_NO_MIDDLE_SPACE = (IT_SIMPLE_VAT_EXPECTED_ADDRESS + '\n' + IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE
+                                + ' ' + IT_VAT_EXPECTED_CITY_WITH_SPACES + ' ' + IT_SIMPLE_VAT_EXPECTED_PROVINCE + '\n')
+
 class TestApi(unittest.TestCase):
     r"""Test the main API."""
 
@@ -116,4 +128,19 @@ class TestApi(unittest.TestCase):
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             api.parse_address_string(IT_SIMPLE_VAT_ADDRESS_STRING_NOT_VALID_NO_PROVINCE, DEFAULT_COUNTRY, strict=True)
 
-        # City with spaces: Repeat every test.
+        ########################################
+        # City with spaces: Repeat every test. #
+        ########################################
+        expected_city_with_spaces = {
+            'address': IT_SIMPLE_VAT_EXPECTED_ADDRESS,
+            'postal code': IT_SIMPLE_VAT_EXPECTED_POSTAL_CODE,
+            'city': IT_VAT_EXPECTED_CITY_WITH_SPACES,
+            'province': IT_SIMPLE_VAT_EXPECTED_PROVINCE
+        }
+
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING, DEFAULT_COUNTRY), expected_city_with_spaces)
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING, DEFAULT_COUNTRY, strict=True), expected_city_with_spaces)
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_S10, DEFAULT_COUNTRY), expected_city_with_spaces)
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_S10, DEFAULT_COUNTRY, strict=True), expected_city_with_spaces)
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_NO_MIDDLE_SPACE, DEFAULT_COUNTRY), expected_city_with_spaces)
+        self.assertEqual(api.parse_address_string(IT_CITY_WITH_SPACES_VAT_ADDRESS_STRING_NO_MIDDLE_SPACE, DEFAULT_COUNTRY, strict=True), expected_city_with_spaces)
