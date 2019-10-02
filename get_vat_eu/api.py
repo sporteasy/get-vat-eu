@@ -31,7 +31,7 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     return response
 
 
-def parse_address_string(address_string: str, country_code: str, strict:bool = False):
+def parse_address_string(address_string: str, country_code: str):
     r"""Get relevant information from the address string.
     :param strict: check that every aspect of the address string
         corresponds to the expected input.
@@ -76,7 +76,7 @@ def parse_address_string(address_string: str, country_code: str, strict:bool = F
 
             # Check that the province is composed of 2 uppercase letter characters.
             # Check that the postal code correponds to the standard.
-            if strict and (not re.match("^\d{5}", postal_code)
+            if (not re.match("^\d{5}", postal_code)
                 or not re.match("^[A-Z]{2}$", province)):
                 raise AddressStringNotCorrespondingToExpectedFormat
 
