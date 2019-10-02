@@ -182,3 +182,5 @@ class TestApi(unittest.TestCase):
             'province': COMPLEX_EXPECTED_PROVINCE
         }
         self._test_parse_address_string_IT_default(expected_complex, variables)
+
+    def test(self):

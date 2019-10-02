@@ -4,8 +4,11 @@
 
 """Exceptions file."""
 
-class CannotGetAnyRelevantInformation(Exception):
-    """The API does not know what to return."""
+class CannotGetTraderAddress(Exception):
+    """The API does not know what the address is."""
+
+class CannotGetTraderName(Exception):
+    """The API does not know what the address."""
 
 class VatNotValid(Exception):
     """The input VAT is not valid."""

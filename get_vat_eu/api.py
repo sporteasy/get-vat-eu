@@ -119,16 +119,21 @@ def parse_response(response: dict):
         if (response['traderStreet'] is None or response['traderCity'] is None
                 or response['traderPostcode'] is None):
             if response['traderAddress'] is None:
-                raise CannotGetAnyRelevantInformation
+                raise CannotGetTraderAddress
             else:
-                trader = parse_address_string(response['traderAddress'])
-                trader_information['city'] = trader['city']
-                trader_information['province'] = trader['province']
-                trader_information['post code'] = trader['post code']
+                # All countries must have a trader information name.
+                trader_information['name'] = response['traderName']
+                if response['contryCode'] == 'IT':
+                    trader = parse_address_string(response['traderAddress'])
+                    trader_information['city'] = trader['city']
+                    trader_information['province'] = trader['province']
+                    trader_information['post code'] = trader['post code']
         else:
-            trader_information['city'] = response['traderCity']
-            trader_information['province'] = response['traderCity']
-            trader_information['post code'] = response['traderPostCode']
+            trader_information['name'] = response['traderName']
+            if response['contryCode'] == 'IT':
+                trader_information['city'] = response['traderCity']
+                trader_information['province'] = response['traderCity']
+                trader_information['post code'] = response['traderPostCode']
     else:
         raise VatNotValid
 
