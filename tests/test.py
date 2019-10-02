@@ -73,7 +73,6 @@ class TestApi(unittest.TestCase):
         BASE_EXPECTED_POSTAL_CODE = '44123'
         BASE_EXPECTED_CITY = 'FERRARA'
         BASE_EXPECTED_PROVINCE = 'FE'
-        # FIXME.
         variables['EXPECTED_POSTAL_CODE'] = BASE_EXPECTED_POSTAL_CODE
         variables['EXPECTED_PROVINCE'] = BASE_EXPECTED_PROVINCE
         variables['ADDRESS_STRING'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POSTAL_CODE
@@ -122,7 +121,7 @@ class TestApi(unittest.TestCase):
             'city': BASE_EXPECTED_CITY,
             'province': BASE_EXPECTED_PROVINCE
         }
-        # self._test_parse_address_string_IT_default(expected_base, variables)
+        self._test_parse_address_string_IT_default(expected_base, variables)
 
         ###########################
         # City field with spaces. #
@@ -134,7 +133,6 @@ class TestApi(unittest.TestCase):
         COMPLEX_EXPECTED_POSTAL_CODE = '44123'
         COMPLEX_EXPECTED_CITY = 'MALBORGETTO DI BOARA'
         COMPLEX_EXPECTED_PROVINCE = 'FE'
-        # FIXME.
         variables['EXPECTED_POSTAL_CODE'] = COMPLEX_EXPECTED_POSTAL_CODE
         variables['EXPECTED_PROVINCE'] = COMPLEX_EXPECTED_PROVINCE
         variables['ADDRESS_STRING'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POSTAL_CODE
