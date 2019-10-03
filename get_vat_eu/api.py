@@ -9,8 +9,10 @@ import json
 import string
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (
-        CannotGetTraderAddress,
+        CannotGetTraderVatNumber,
+        ResponseVatAddressNotConforming,
         CannotGetTraderName,
+        CannotGetTraderAddress,
         VatNotValid,
         AddressStringNotCorrespondingToExpectedFormat,
         CountryCodeNotImplemented)
@@ -94,8 +96,19 @@ def parse_address_string(address_string: str, country_code: str):
 
     return trader_information
 
+def vat_adheres_to_specifications(vat_number: str, country_code: str = countries['code']['default']):
+    """Chceck that the VAT number corresponds to the specifications."""
+    # TODO assertions
+    vat_conforming = True
 
-def parse_response(response: dict):
+    # https://it.wikipedia.org/wiki/Partita_IVA#Numeri_IVA_nell'Unione_europea
+    wikipedia_vat_regex = "((ATU|DK|FI|HU|LU|MT|SI)[0-9]{8}|(BE|BG)[0-9]{9,10}|(ES([0-9]|[A-Z])[0-9]{7}([A-Z]|[0-9]))|(HR|IT|LV)[0-9]{11}|CY[0-9]{8}[A-Z]|CZ[0-9]{8,10}|(DE|EE|EL|GB|PT)[0-9]{9}|FR[A-Z0-9]{2}[0-9]{8}[A-Z0-9]|IE[0-9]{7}[A-Z0-9]{2}|LT[0-9]{9}([0-9]{3})?|NL[0-9]{9}B([0-9]{2})|PL[0-9]{10}|RO[0-9]{2,10}|SK[0-9]{10}|SE[0-9]{12})"
+    if not re.match(wikipedia_vat_regex, country_code + vat_number):
+        vat_conforming = False
+
+    return vat_conforming
+
+def parse_response(response: dict, vat_number: str, country_code: str = countries['code']['default']):
     r"""Parses the response and get the relevant fields."""
     assert 'countryCode' in response
     assert 'vatNumber' in response
@@ -120,21 +133,32 @@ def parse_response(response: dict):
     assert response['valid'] is not None
     assert isinstance(response['valid'], bool)
 
-    # Return trader name as well
+    if response['countryCode'] != country_code:
+        pass
+        # TODO
+
+    if response['vatNumber'] != vat_number:
+        pass
+        # TODO
+
 
     trader_information = dict()
 
     # 'valid' is compulsory.
     if response['valid']:
+        if response['vatNumber'] is None:
+            raise CannotGetTraderVatNumber
+        elif not vat_adheres_to_specifications(response['vatNumber']):
+            raise ResponseVatNumberNotConforming
+
         # 'contryCode' is compulsory.
         if response['countryCode'] == 'IT':
 
-            # FIXME.
-            trader_information['name'] = response['traderName']
+            if response['traderName'] is None:
+                raise CannotGetTraderName
+            else:
+                trader_information['name'] = response['traderName']
 
-            # TODO: check that the VAT number adheres to the
-            # TODO: specifications: https://it.wikipedia.org/wiki/Partita_IVA
-            # if response['vatNumber']
             if (response['traderStreet'] is None or response['traderCity'] is None
                     or response['traderPostcode'] is None):
                 if response['traderAddress'] is None:
@@ -170,7 +194,7 @@ def dict_to_json(information: dict):
 
 def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=False):
     response = request_vat_information(vat_number, country_code)
-    trader_information = parse_response(response)
+    trader_information = parse_response(response, vat_number, country_code)
     if trader_information_pretty:
         prettify_trader_information(trader_information, country_code)
     return dict_to_json(trader_information)

@@ -4,11 +4,17 @@
 
 """Exceptions file."""
 
-class CannotGetTraderAddress(Exception):
-    """The API does not know what the address is."""
+class CannotGetTraderVatNumber(Exception):
+    """The API does not know what the address."""
+
+class ResponseVatAddressNotConforming(Exception):
+    """The API does not know what the address."""
 
 class CannotGetTraderName(Exception):
     """The API does not know what the address."""
+
+class CannotGetTraderAddress(Exception):
+    """The API does not know what the address is."""
 
 class VatNotValid(Exception):
     """The input VAT is not valid."""
