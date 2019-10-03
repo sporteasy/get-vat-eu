@@ -5,6 +5,8 @@
 
 import re
 import zeep
+import json
+import string
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (
         CannotGetTraderAddress,
@@ -28,9 +30,7 @@ from .exceptions import (
 def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
     r"""Make a SOAP request and expect a response."""
 
-    # FIXME use variable in the constants file.
-    URL = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-    client = zeep.Client(URL)
+    client = zeep.Client(urls['ec check vat api'])
     response = client.service.checkVatApprox(country_code, vat_number)
 
     return response
@@ -92,7 +92,6 @@ def parse_address_string(address_string: str, country_code: str):
         else:
             raise AddressStringNotCorrespondingToExpectedFormat
 
-
     return trader_information
 
 
@@ -129,6 +128,10 @@ def parse_response(response: dict):
     if response['valid']:
         # 'contryCode' is compulsory.
         if response['countryCode'] == 'IT':
+
+            # FIXME.
+            trader_information['name'] = response['traderName']
+
             # TODO: check that the VAT number adheres to the
             # TODO: specifications: https://it.wikipedia.org/wiki/Partita_IVA
             # if response['vatNumber']
@@ -155,8 +158,19 @@ def parse_response(response: dict):
 
     return trader_information
 
+def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
+    # TODO: Assertions
+    if country_code == 'IT':
+        information['name'] = string.capwords(information['name'])
+        information['address'] = string.capwords(information['address'])
+        information['city'] = string.capwords(information['city'])
+
 def dict_to_json(information: dict):
+    return json.dumps(information)
 
-    translated_to_json = None
-
-    return translated_to_json
+def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=False):
+    response = request_vat_information(vat_number, country_code)
+    trader_information = parse_response(response)
+    if trader_information_pretty:
+        prettify_trader_information(trader_information, country_code)
+    return dict_to_json(trader_information)
