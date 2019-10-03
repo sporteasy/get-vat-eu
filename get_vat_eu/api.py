@@ -6,7 +6,12 @@
 import re
 import zeep
 from .constants import (common_defaults, urls, countries)
-from .exceptions import (CannotGetAnyRelevantInformation, VatNotValid, AddressStringNotCorrespondingToExpectedFormat)
+from .exceptions import (
+        CannotGetTraderAddress,
+        CannotGetTraderName,
+        VatNotValid,
+        AddressStringNotCorrespondingToExpectedFormat,
+        CountryCodeNotImplemented)
 
 
 # TODO handle exceptions:
@@ -81,7 +86,7 @@ def parse_address_string(address_string: str, country_code: str):
                 raise AddressStringNotCorrespondingToExpectedFormat
 
             trader_information['address'] = address_substring
-            trader_information['postal code'] = postal_code
+            trader_information['post code'] = postal_code
             trader_information['province'] = province
             trader_information['city'] = city
         else:
@@ -92,7 +97,7 @@ def parse_address_string(address_string: str, country_code: str):
 
 
 def parse_response(response: dict):
-    r"""Parses the reponse and get the relevant fields."""
+    r"""Parses the response and get the relevant fields."""
     assert 'countryCode' in response
     assert 'vatNumber' in response
     assert 'requestDate' in response
@@ -101,39 +106,50 @@ def parse_response(response: dict):
     assert 'traderCompanyType' in response
     assert 'traderAddress' in response
     assert 'traderStreet' in response
-    assert 'traderPostcode' in reponse
-    assert 'traderCity' in reponse
-    assert 'traderNameMatch' in reponse
-    assert 'traderCompanyTypeMatch' in reponse
-    assert 'traderStreetMatch' in reponse
-    assert 'traderPostcodeMatch' in reponse
-    assert 'traderCityMatch' in reponse
-    assert 'requestIdentifier' in reponse
-
+    assert 'traderPostcode' in response
+    assert 'traderCity' in response
+    assert 'traderNameMatch' in response
+    assert 'traderCompanyTypeMatch' in response
+    assert 'traderStreetMatch' in response
+    assert 'traderPostcodeMatch' in response
+    assert 'traderCityMatch' in response
+    assert 'requestIdentifier' in response
+    # These variables must be defined.
+    assert response['countryCode'] is not None
+    assert response['vatNumber'] is not None
+    assert response['requestDate'] is not None
+    assert response['valid'] is not None
+    assert isinstance(response['valid'], bool)
 
     # Return trader name as well
 
     trader_information = dict()
 
+    # 'valid' is compulsory.
     if response['valid']:
-        if (response['traderStreet'] is None or response['traderCity'] is None
-                or response['traderPostcode'] is None):
-            if response['traderAddress'] is None:
-                raise CannotGetTraderAddress
-            else:
-                # All countries must have a trader information name.
-                trader_information['name'] = response['traderName']
-                if response['contryCode'] == 'IT':
-                    trader = parse_address_string(response['traderAddress'])
+        # 'contryCode' is compulsory.
+        if response['countryCode'] == 'IT':
+            # TODO: check that the VAT number adheres to the
+            # TODO: specifications: https://it.wikipedia.org/wiki/Partita_IVA
+            # if response['vatNumber']
+            if (response['traderStreet'] is None or response['traderCity'] is None
+                    or response['traderPostcode'] is None):
+                if response['traderAddress'] is None:
+                    raise CannotGetTraderAddress
+                else:
+                    trader = parse_address_string(response['traderAddress'], response['countryCode'])
+                    trader_information['address'] = trader['address']
                     trader_information['city'] = trader['city']
                     trader_information['province'] = trader['province']
                     trader_information['post code'] = trader['post code']
-        else:
-            trader_information['name'] = response['traderName']
-            if response['contryCode'] == 'IT':
+            else:
+                trader_information['address'] = trader['address']
                 trader_information['city'] = response['traderCity']
                 trader_information['province'] = response['traderCity']
                 trader_information['post code'] = response['traderPostCode']
+        # A generic country.
+        else:
+            raise CountryCodeNotImplemented
     else:
         raise VatNotValid
 

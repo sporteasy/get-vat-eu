@@ -15,3 +15,6 @@ class VatNotValid(Exception):
 
 class AddressStringNotCorrespondingToExpectedFormat(Exception):
     """The address string does not correspond to the expected format."""
+
+class CountryCodeNotImplemented(Exception):
+    """The specified country has no implementation yet."""
