@@ -33,7 +33,7 @@ class TestApi(unittest.TestCase):
             api.parse_address_string(variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'], COUNTRY_CODE)
 
         expected_patch = copy.copy(expected)
-        expected_patch['post code'] = variables['EXPECTED_POST_CODE'][:-1]
+        expected_patch['post_code'] = variables['EXPECTED_POST_CODE'][:-1]
         with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
             self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'], COUNTRY_CODE), expected_patch)
 
@@ -117,7 +117,7 @@ class TestApi(unittest.TestCase):
         # A generic valid VAT record.
         expected_base = {
             'address': BASE_EXPECTED_ADDRESS,
-            'post code': BASE_EXPECTED_POST_CODE,
+            'post_code': BASE_EXPECTED_POST_CODE,
             'city': BASE_EXPECTED_CITY,
             'province': BASE_EXPECTED_PROVINCE
         }
@@ -177,7 +177,7 @@ class TestApi(unittest.TestCase):
         # A generic valid VAT record.
         expected_complex = {
             'address': COMPLEX_EXPECTED_ADDRESS,
-            'post code': COMPLEX_EXPECTED_POST_CODE,
+            'post_code': COMPLEX_EXPECTED_POST_CODE,
             'city': COMPLEX_EXPECTED_CITY,
             'province': COMPLEX_EXPECTED_PROVINCE
         }
@@ -186,15 +186,18 @@ class TestApi(unittest.TestCase):
     def test_parse_response_IT(self):
         ADDRESS = 'FORNO SCALDOTTO DI FEFFO FORNI 10 INT 8\n 44100 FERRARA FE\n'
         REQUEST_DATE = 'some date'
+        VAT_NUMBER = '12345678901'
+        COUNTRY_CODE = 'IT'
+        TRADER_NAME = 'LOL'
         response = {
-            'countryCode': 'IT',
-            'vatNumber': '123232',
+            'countryCode': COUNTRY_CODE,
+            'vatNumber': VAT_NUMBER,
             'requestDate': REQUEST_DATE,
             'valid': True,
             'traderStreet': None,
             'traderCity': None,
             'traderAddress': ADDRESS,
-            'traderName': None,
+            'traderName': TRADER_NAME,
             'traderCompanyType': None,
             'traderStreet': None,
             'traderPostcode': None,
@@ -207,19 +210,20 @@ class TestApi(unittest.TestCase):
         }
 
         # Assert not raises.
-        api.parse_response(response)
+        api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
 
         response['traderAddress'] = None
         with self.assertRaises(exceptions.CannotGetTraderAddress):
-            api.parse_response(response)
+            api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
 
         response['traderAddress'] = ADDRESS
         response['valid'] = False
         with self.assertRaises(exceptions.VatNotValid):
-            api.parse_response(response)
+            api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
 
         response['valid'] = True
-        response['countryCode'] = 'ZZ'
+        COUNTRY_CODE_FAKE = 'ZZ'
+        response['countryCode'] = COUNTRY_CODE_FAKE
         with self.assertRaises(exceptions.CountryCodeNotImplemented):
-            api.parse_response(response)
+            api.parse_response(response, VAT_NUMBER, COUNTRY_CODE_FAKE)
 
