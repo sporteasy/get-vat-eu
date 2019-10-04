@@ -7,11 +7,8 @@
 class ResponseIOError(Exception):
     """Input and expected output differ."""
 
-class CannotGetTraderVatNumber(Exception):
-    """The API does not know what the address."""
-
-class ResponseVatAddressNotConforming(Exception):
-    """The API does not know what the address."""
+class ResponseVatNumberNotConforming(Exception):
+    """The VAT number returned by the API does not conform to specifications."""
 
 class CannotGetTraderName(Exception):
     """The API does not know what the address."""

@@ -23,8 +23,7 @@ Exceptions
 ----------
 
 .. autoexception:: ResponseIOError
-.. autoexception:: CannotGetTraderVatNumber
-.. autoexception:: ResponseVatAddressNotConforming
+.. autoexception:: ResponseVatNumberNotConforming
 .. autoexception:: CannotGetTraderName
 .. autoexception:: CannotGetTraderAddress
 .. autoexception:: VatNotValid

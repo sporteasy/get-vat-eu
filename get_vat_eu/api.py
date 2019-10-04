@@ -10,8 +10,7 @@ import string
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (
         ResponseIOError,
-        CannotGetTraderVatNumber,
-        ResponseVatAddressNotConforming,
+        ResponseVatNumberNotConforming,
         CannotGetTraderName,
         CannotGetTraderAddress,
         VatNotValid,
@@ -106,7 +105,16 @@ def vat_adheres_to_specifications(vat_number: str, country_code: str = countries
     return vat_conforming
 
 def parse_response(response: dict, vat_number: str, country_code: str = countries['code']['default']) -> dict:
-    r"""Parses the response and get the relevant fields."""
+    r"""Parses the response and get the relevant fields.
+
+    :param response: a data structure containing the SOAP response.
+    :param country_code: a two letter uppercase country identifier.
+    :type response: dict
+    :type country_code: str
+    :returns: a data structure with keys differing from country code to country code.
+    :rtype: dict
+    :raises: ResponseIOError, ResponseVatNumberNotConforming or a built-in exception.
+    """
     assert 'countryCode' in response
     assert 'vatNumber' in response
     assert 'requestDate' in response
@@ -129,6 +137,7 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     assert response['requestDate'] is not None
     assert response['valid'] is not None
     assert isinstance(response['valid'], bool)
+    assert isinstance(response['vatNumber'], str)
 
     if response['countryCode'] != country_code:
         raise ResponseIOError
@@ -139,9 +148,7 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
 
     # 'valid' is compulsory.
     if response['valid']:
-        if response['vatNumber'] is None:
-            raise CannotGetTraderVatNumber
-        elif not vat_adheres_to_specifications(response['vatNumber']):
+        if not vat_adheres_to_specifications(response['vatNumber']):
             raise ResponseVatNumberNotConforming
 
         # 'contryCode' is compulsory.

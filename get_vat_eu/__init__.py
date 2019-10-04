@@ -7,8 +7,7 @@ from .api import (
     pipeline)
 from .exceptions import (
     ResponseIOError,
-    CannotGetTraderVatNumber,
-    ResponseVatAddressNotConforming,
+    ResponseVatNumberNotConforming,
     CannotGetTraderName,
     CannotGetTraderAddress,
     VatNotValid,
