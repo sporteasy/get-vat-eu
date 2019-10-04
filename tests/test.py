@@ -246,6 +246,7 @@ class TestApi(unittest.TestCase):
         REQUEST_DATE = 'some date'
         VAT_NUMBER = '12345678901'
         COUNTRY_CODE = 'IT'
+        FAKE_COUNTRY_CODE = 'ZZ'
         TRADER_NAME = 'LOL'
         response = {
             'countryCode': COUNTRY_CODE,
@@ -270,6 +271,21 @@ class TestApi(unittest.TestCase):
         # Assert not raises.
         api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
 
+        response['countryCode'] = FAKE_COUNTRY_CODE
+        with self.assertRaises(exceptions.ResponseIOError):
+            api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
+
+        response['countryCode'] = COUNTRY_CODE
+        response['vatNumber'] = VAT_NUMBER[:-1]
+        with self.assertRaises(exceptions.ResponseVatNumberNotConforming):
+            api.parse_response(response, VAT_NUMBER[:-1], COUNTRY_CODE)
+
+        response['vatNumber'] = VAT_NUMBER
+        response['traderName'] = None
+        with self.assertRaises(exceptions.CannotGetTraderName):
+            api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
+
+        response['traderName'] = TRADER_NAME
         response['traderAddress'] = None
         with self.assertRaises(exceptions.CannotGetTraderAddress):
             api.parse_response(response, VAT_NUMBER, COUNTRY_CODE)
