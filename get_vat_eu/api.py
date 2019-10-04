@@ -266,4 +266,4 @@ def pipeline(vat_number: str,
     if show_input:
         trader_information['vat_number'] = vat_number
         trader_information['country_code'] = country_code
-    return json.dumps(trader_information)
+    return json.dumps(trader_information, indent=4, sort_keys=True)
