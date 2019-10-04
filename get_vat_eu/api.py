@@ -35,9 +35,15 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
 def parse_address_string(address_string: str, country_code: str):
     r"""Get relevant information from the address string.
 
-    .. note:: From empirical evidence, an address string is structured like this:
-        IT: '${address} ${house_number} \n${postal_code} ${city} ${PROVINCE}\n'
+    :param address_string: a string containing all the address information.
+    :param country_code: a two letter uppercase identifier.
+    :type address_string: str
+    :type country_code: str
+    :returns: a data structure with keys differing from country code to country code.
+    :rtype: dict
+    :raises: AddressStringNotCorrespondingToExpectedFormat or a built-in exception.
     """
+    assert len(country_code) == 2
 
     trader_information = dict()
 

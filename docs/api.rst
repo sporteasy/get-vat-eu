@@ -23,6 +23,13 @@ output types.
 Exceptions
 ----------
 
-.. autoexception::  CannotGetTraderVatNumber
+.. autoexception:: ResponseIOError
+.. autoexception:: CannotGetTraderVatNumber
+.. autoexception:: ResponseVatAddressNotConforming
+.. autoexception:: CannotGetTraderName
+.. autoexception:: CannotGetTraderAddress
+.. autoexception:: VatNotValid
+.. autoexception:: AddressStringNotCorrespondingToExpectedFormat
+.. autoexception:: CountryCodeNotImplemented
 
 
