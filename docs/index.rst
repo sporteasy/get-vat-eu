@@ -10,7 +10,7 @@ Welcome to get-vat-eu's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   index
+   api
    specifications
 
 Indices and tables

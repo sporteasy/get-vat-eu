@@ -6,4 +6,12 @@ from .api import (
     prettify_trader_information,
     dict_to_json,
     pipeline)
-
+from .exceptions import (
+    ResponseIOError,
+    CannotGetTraderVatNumber,
+    ResponseVatAddressNotConforming,
+    CannotGetTraderName,
+    CannotGetTraderAddress,
+    VatNotValid,
+    AddressStringNotCorrespondingToExpectedFormat,
+    CountryCodeNotImplemented)

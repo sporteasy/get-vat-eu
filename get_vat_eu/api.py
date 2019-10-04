@@ -9,6 +9,7 @@ import json
 import string
 from .constants import (common_defaults, urls, countries)
 from .exceptions import (
+        ResponseIOError,
         CannotGetTraderVatNumber,
         ResponseVatAddressNotConforming,
         CannotGetTraderName,
@@ -21,13 +22,8 @@ from .exceptions import (
 def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
     r"""Make a SOAP request and expect a response.
 
-    zeep might raise exceptions like this: zeep.exceptions.Fault: SERVICE_UNAVAILABLE
-    - INVALID_INPUT: The provided CountryCode is invalid or the VAT number is empty;
-    - GLOBAL_MAX_CONCURRENT_REQ: Your Request for VAT validation has not been processed; the maximum number of concurrent requests has been reached. Please re-submit your request later or contact TAXUD-VIESWEB@ec.europa.eu for further information": Your request cannot be processed due to high traffic on the web application. Please try again later; 
-    - MS_MAX_CONCURRENT_REQ: Your Request for VAT validation has not been processed; the maximum number of concurrent requests for this Member State has been reached. Please re-submit your request later or contact TAXUD-VIESWEB@ec.europa.eu for further information": Your request cannot be processed due to high traffic towards the Member State you are trying to reach. Please try again later. 
-    - SERVICE_UNAVAILABLE: an error was encountered either at the network level or the Web application level, try again later; 
-    - MS_UNAVAILABLE: The application at the Member State is not replying or not available. Please refer to the Technical Information page to check the status of the requested Member State, try again later; 
-    - TIMEOUT: The application did not receive a reply within the allocated time period, try again later. 
+
+    .. raises: zeep.exceptions.Fault or a built-in exception.
     """
 
     client = zeep.Client(urls['ec check vat api'])
@@ -38,9 +34,6 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
 
 def parse_address_string(address_string: str, country_code: str):
     r"""Get relevant information from the address string.
-    :param strict: check that every aspect of the address string
-        corresponds to the expected input.
-
 
     .. note:: From empirical evidence, an address string is structured like this:
         IT: '${address} ${house_number} \n${postal_code} ${city} ${PROVINCE}\n'
@@ -179,7 +172,6 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
 def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
     # TODO: Assertions
     if country_code == 'IT':
-        # information['name'] = string.capwords(information['name'])
         information['address'] = string.capwords(information['address'])
         information['city'] = string.capwords(information['city'])
 
