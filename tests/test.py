@@ -14,55 +14,85 @@ S4 = 4 * ' '
 S5 = 5 * ' '
 S10 = 10 * ' '
 
+
 class TestApi(unittest.TestCase):
     r"""Test the main API."""
 
-    def _test_parse_address_string_IT_default(self, expected: dict, variables: dict):
-
+    def _test_parse_address_string_IT_common(self, expected: dict,
+                                             variables: dict):
+        """Common tests."""
         COUNTRY_CODE = 'IT'
 
-        self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING'], COUNTRY_CODE), expected)
-        self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING_S10'], COUNTRY_CODE), expected)
-        self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'], COUNTRY_CODE), expected)
+        self.assertEqual(
+            api.parse_address_string(variables['ADDRESS_STRING'],
+                                     COUNTRY_CODE), expected)
+        self.assertEqual(
+            api.parse_address_string(variables['ADDRESS_STRING_S10'],
+                                     COUNTRY_CODE), expected)
+        self.assertEqual(
+            api.parse_address_string(
+                variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'], COUNTRY_CODE),
+            expected)
 
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'], COUNTRY_CODE)
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'], COUNTRY_CODE)
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'], COUNTRY_CODE)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'],
+                COUNTRY_CODE)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'],
+                COUNTRY_CODE)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'],
+                COUNTRY_CODE)
 
         expected_patch = copy.copy(expected)
         expected_patch['post_code'] = variables['EXPECTED_POST_CODE'][:-1]
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'], COUNTRY_CODE), expected_patch)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            self.assertEqual(
+                api.parse_address_string(
+                    variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'],
+                    COUNTRY_CODE), expected_patch)
 
         expected_patch = copy.copy(expected)
         expected_patch['province'] = variables['EXPECTED_PROVINCE'][:-1]
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            self.assertEqual(api.parse_address_string(variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'], COUNTRY_CODE), expected_patch)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            self.assertEqual(
+                api.parse_address_string(
+                    variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'],
+                    COUNTRY_CODE), expected_patch)
 
-        # No POSTAL code.
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'], COUNTRY_CODE)
+        # No postal code.
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'], COUNTRY_CODE)
 
         # No city.
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_CITY_NOT_EXISTS'], COUNTRY_CODE)
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_CITY_NOT_EXISTS'], COUNTRY_CODE)
 
         # No province.
-        with self.assertRaises(exceptions.AddressStringNotCorrespondingToExpectedFormat):
-            api.parse_address_string(variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'], COUNTRY_CODE)
-
+        with self.assertRaises(
+                exceptions.AddressStringNotCorrespondingToExpectedFormat):
+            api.parse_address_string(
+                variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'], COUNTRY_CODE)
 
     def test_parse_address_string_IT(self):
-        r"""
+        r"""Test.
 
         .. note:: variable naming schema:
                    field = ${CASE}_EXPECTED_${FIELD}[_${EXCEPTION_TO_THE_ORIGINAL_CASE}]
                    BASE_ADDRESS_STRING[_${EXCEPTIONS_TO_THE_ORIGINAL_CASE}] = (${fields})
         """
-
         ##############################
         # City field without spaces. #
         ##############################
@@ -75,44 +105,56 @@ class TestApi(unittest.TestCase):
         BASE_EXPECTED_PROVINCE = 'FE'
         variables['EXPECTED_POST_CODE'] = BASE_EXPECTED_POST_CODE
         variables['EXPECTED_PROVINCE'] = BASE_EXPECTED_PROVINCE
-        variables['ADDRESS_STRING'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE
-                                   + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE + ' '
+            + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
 
         # Prepend and append a fixed number of spaces.
         BASE_EXPECTED_ADDRESS_S10 = S10 + BASE_EXPECTED_ADDRESS + S10
         BASE_EXPECTED_POST_CODE_S10 = S10 + BASE_EXPECTED_POST_CODE + S10
         BASE_EXPECTED_CITY_S10 = S10 + BASE_EXPECTED_CITY + S10
         BASE_EXPECTED_PROVINCE_S10 = S10 + BASE_EXPECTED_PROVINCE + S10
-        variables['ADDRESS_STRING_S10'] = (BASE_EXPECTED_ADDRESS_S10 + '\n' + ' ' + BASE_EXPECTED_POST_CODE_S10
-                                        + ' ' + BASE_EXPECTED_CITY_S10 + ' ' + BASE_EXPECTED_PROVINCE_S10 + '\n')
+        variables['ADDRESS_STRING_S10'] = (
+            BASE_EXPECTED_ADDRESS_S10 + '\n' + ' ' +
+            BASE_EXPECTED_POST_CODE_S10 + ' ' + BASE_EXPECTED_CITY_S10 + ' ' +
+            BASE_EXPECTED_PROVINCE_S10 + '\n')
 
         # Remove the middle space from the string.
-        variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'] = (BASE_EXPECTED_ADDRESS + '\n' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + BASE_EXPECTED_POST_CODE + ' ' +
+            BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'] = (BASE_EXPECTED_ADDRESS + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'] = (
+            BASE_EXPECTED_ADDRESS + ' ' + BASE_EXPECTED_POST_CODE + ' ' +
+            BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE)
+        variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE + ' '
+            + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE)
 
-        variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'] = (BASE_EXPECTED_ADDRESS + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE)
+        variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'] = (
+            BASE_EXPECTED_ADDRESS + ' ' + BASE_EXPECTED_POST_CODE + ' ' +
+            BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE)
 
-        variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE[:-1]
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE[:-1] +
+            ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE[:-1] + '\n')
+        variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE + ' '
+            + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE[:-1] + '\n')
 
-        variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + ' '
-                                        + BASE_EXPECTED_CITY + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + ' ' + BASE_EXPECTED_CITY + ' '
+            + BASE_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_CITY_NOT_EXISTS'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + ' ' + BASE_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_CITY_NOT_EXISTS'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE + ' '
+            + ' ' + BASE_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'] = (BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE
-                                        + ' ' + BASE_EXPECTED_CITY + ' ' + '\n')
+        variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'] = (
+            BASE_EXPECTED_ADDRESS + '\n' + ' ' + BASE_EXPECTED_POST_CODE + ' '
+            + BASE_EXPECTED_CITY + ' ' + '\n')
 
         # A generic valid VAT record.
         expected_base = {
@@ -121,7 +163,7 @@ class TestApi(unittest.TestCase):
             'city': BASE_EXPECTED_CITY,
             'province': BASE_EXPECTED_PROVINCE
         }
-        self._test_parse_address_string_IT_default(expected_base, variables)
+        self._test_parse_address_string_IT_common(expected_base, variables)
 
         ###########################
         # City field with spaces. #
@@ -135,44 +177,59 @@ class TestApi(unittest.TestCase):
         COMPLEX_EXPECTED_PROVINCE = 'FE'
         variables['EXPECTED_POST_CODE'] = COMPLEX_EXPECTED_POST_CODE
         variables['EXPECTED_PROVINCE'] = COMPLEX_EXPECTED_PROVINCE
-        variables['ADDRESS_STRING'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                   + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
+            + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE +
+            '\n')
 
         # Prepend and append a fixed number of spaces.
         COMPLEX_EXPECTED_ADDRESS_S10 = S10 + COMPLEX_EXPECTED_ADDRESS + S10
         COMPLEX_EXPECTED_POST_CODE_S10 = S10 + COMPLEX_EXPECTED_POST_CODE + S10
         COMPLEX_EXPECTED_CITY_S10 = S10 + COMPLEX_EXPECTED_CITY + S10
         COMPLEX_EXPECTED_PROVINCE_S10 = S10 + COMPLEX_EXPECTED_PROVINCE + S10
-        variables['ADDRESS_STRING_S10'] = (COMPLEX_EXPECTED_ADDRESS_S10 + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE_S10
-                                        + ' ' + COMPLEX_EXPECTED_CITY_S10 + ' ' + COMPLEX_EXPECTED_PROVINCE_S10 + '\n')
+        variables['ADDRESS_STRING_S10'] = (
+            COMPLEX_EXPECTED_ADDRESS_S10 + '\n' + ' ' +
+            COMPLEX_EXPECTED_POST_CODE_S10 + ' ' + COMPLEX_EXPECTED_CITY_S10 +
+            ' ' + COMPLEX_EXPECTED_PROVINCE_S10 + '\n')
 
         # Remove the middle space from the string.
-        variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_NO_MIDDLE_SEPARATOR'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + COMPLEX_EXPECTED_POST_CODE + ' '
+            + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'] = (COMPLEX_EXPECTED_ADDRESS + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_MISSING_FIRST_DELIMITER'] = (
+            COMPLEX_EXPECTED_ADDRESS + ' ' + COMPLEX_EXPECTED_POST_CODE + ' ' +
+            COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE)
+        variables['ADDRESS_STRING_MISSING_LAST_DELIMITER'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
+            + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE)
 
-        variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'] = (COMPLEX_EXPECTED_ADDRESS + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE)
+        variables['ADDRESS_STRING_MISSING_BOTH_DELIMITERS'] = (
+            COMPLEX_EXPECTED_ADDRESS + ' ' + COMPLEX_EXPECTED_POST_CODE + ' ' +
+            COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE)
 
-        variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE[:-1]
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_POST_CODE_NOT_CONFORMING'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' +
+            COMPLEX_EXPECTED_POST_CODE[:-1] + ' ' + COMPLEX_EXPECTED_CITY + ' '
+            + COMPLEX_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE[:-1] + '\n')
+        variables['ADDRESS_STRING_PROVINCE_NOT_CONFORMING'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
+            + ' ' + COMPLEX_EXPECTED_CITY + ' ' +
+            COMPLEX_EXPECTED_PROVINCE[:-1] + '\n')
 
-        variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + ' '
-                                        + COMPLEX_EXPECTED_CITY + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_POST_CODE_NOT_EXISTS'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + ' ' + COMPLEX_EXPECTED_CITY
+            + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_CITY_NOT_EXISTS'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
+        variables['ADDRESS_STRING_CITY_NOT_EXISTS'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
+            + ' ' + ' ' + COMPLEX_EXPECTED_PROVINCE + '\n')
 
-        variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'] = (COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
-                                        + ' ' + COMPLEX_EXPECTED_CITY + ' ' + '\n')
+        variables['ADDRESS_STRING_PROVINCE_NOT_EXISTS'] = (
+            COMPLEX_EXPECTED_ADDRESS + '\n' + ' ' + COMPLEX_EXPECTED_POST_CODE
+            + ' ' + COMPLEX_EXPECTED_CITY + ' ' + '\n')
 
         # A generic valid VAT record.
         expected_complex = {
@@ -181,9 +238,10 @@ class TestApi(unittest.TestCase):
             'city': COMPLEX_EXPECTED_CITY,
             'province': COMPLEX_EXPECTED_PROVINCE
         }
-        self._test_parse_address_string_IT_default(expected_complex, variables)
+        self._test_parse_address_string_IT_common(expected_complex, variables)
 
     def test_parse_response_IT(self):
+        """Test."""
         ADDRESS = 'FORNO SCALDOTTO DI FEFFO FORNI 10 INT 8\n 44100 FERRARA FE\n'
         REQUEST_DATE = 'some date'
         VAT_NUMBER = '12345678901'
@@ -226,4 +284,3 @@ class TestApi(unittest.TestCase):
         response['countryCode'] = COUNTRY_CODE_FAKE
         with self.assertRaises(exceptions.CountryCodeNotImplemented):
             api.parse_response(response, VAT_NUMBER, COUNTRY_CODE_FAKE)
-

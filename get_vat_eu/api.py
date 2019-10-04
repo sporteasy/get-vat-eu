@@ -9,16 +9,14 @@ import json
 import string
 from .constants import (common_defaults, urls, vat, countries)
 from .exceptions import (
-        ResponseIOError,
-        ResponseVatNumberNotConforming,
-        CannotGetTraderName,
-        CannotGetTraderAddress,
-        VatNotValid,
-        AddressStringNotCorrespondingToExpectedFormat,
-        CountryCodeNotImplemented)
+    ResponseIOError, ResponseVatNumberNotConforming, CannotGetTraderName,
+    CannotGetTraderAddress, VatNotValid,
+    AddressStringNotCorrespondingToExpectedFormat, CountryCodeNotImplemented)
 
 
-def request_vat_information(vat_number: str, country_code: str = countries['code']['default']) -> dict:
+def request_vat_information(vat_number: str,
+                            country_code: str = countries['code']['default']
+                            ) -> dict:
     r"""Make a SOAP request and expect a response.
 
     :param vat_number: the vat number identifier.
@@ -36,7 +34,9 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     return response
 
 
-def parse_address_string(address_string: str, country_code: str = countries['code']['default']) -> dict:
+def parse_address_string(address_string: str,
+                         country_code: str = countries['code']['default']
+                         ) -> dict:
     r"""Get relevant information from the address string.
 
     :param address_string: a string containing all the address information.
@@ -52,14 +52,18 @@ def parse_address_string(address_string: str, country_code: str = countries['cod
     trader_information = dict()
 
     if country_code == 'IT':
-        if (address_string.endswith(countries['IT']['address_string']['separator'])
-            and countries['IT']['address_string']['separator'] in address_string[0:-1]):
+        if (address_string.endswith(
+                countries['IT']['address_string']['separator'])
+                and countries['IT']['address_string']['separator'] in
+                address_string[0:-1]):
 
             # Divide the original string in two parts. Ignore the final empty string.
-            buf = address_string.split(countries['IT']['address_string']['separator'])[:-1]
+            buf = address_string.split(
+                countries['IT']['address_string']['separator'])[:-1]
 
             # The address part is the first substring. Remove spaces around the string borders.
-            address_substring = buf[0].strip(countries['IT']['address_string']['delimiter'])
+            address_substring = buf[0].strip(
+                countries['IT']['address_string']['delimiter'])
 
             # Postal code, city, province.
             pc_cty_prv_substring = buf[1]
@@ -67,9 +71,12 @@ def parse_address_string(address_string: str, country_code: str = countries['cod
             # Get the other substring into its various components.
             # Always be tolerant with the delimiters on the borders.
             # Remove empty substrings in case of unexpected address string formats.
-            buf = list(filter(None,
-                pc_cty_prv_substring.strip(
-                    countries['IT']['address_string']['delimiter']).split(countries['IT']['address_string']['delimiter'])))
+            buf = list(
+                filter(
+                    None,
+                    pc_cty_prv_substring.strip(
+                        countries['IT']['address_string']['delimiter']).split(
+                            countries['IT']['address_string']['delimiter'])))
 
             # We expect at least 3 elements: postal code, province and city.
             if len(buf) < 3:
@@ -80,12 +87,16 @@ def parse_address_string(address_string: str, country_code: str = countries['cod
             province = buf[-1]
             # A city might contain spaces (delimiters).
             # Always be tolerant with the delimiters on the borders.
-            city = countries['IT']['address_string']['delimiter'].join(buf[1:-1]).strip(countries['IT']['address_string']['delimiter'])
+            city = countries['IT']['address_string']['delimiter'].join(
+                buf[1:-1]).strip(
+                    countries['IT']['address_string']['delimiter'])
 
             # Check that the province is composed of 2 uppercase letter characters.
             # Check that the postal code correponds to the standard.
-            if (not re.match(countries['IT']['post_code']['regex'], postal_code)
-                or not re.match(countries['IT']['province']['regex'], province)):
+            if (not re.match(countries['IT']['post_code']['regex'],
+                             postal_code)
+                    or not re.match(countries['IT']['province']['regex'],
+                                    province)):
                 raise AddressStringNotCorrespondingToExpectedFormat
 
             trader_information['address'] = address_substring
@@ -97,7 +108,10 @@ def parse_address_string(address_string: str, country_code: str = countries['cod
 
     return trader_information
 
-def vat_adheres_to_specifications(vat_number: str, country_code: str = countries['code']['default']) -> bool:
+
+def vat_adheres_to_specifications(
+        vat_number: str,
+        country_code: str = countries['code']['default']) -> bool:
     r"""Check that the VAT number corresponds to the specifications.
 
     :param vat_number: the vat number identifier.
@@ -116,7 +130,10 @@ def vat_adheres_to_specifications(vat_number: str, country_code: str = countries
 
     return vat_conforming
 
-def parse_response(response: dict, vat_number: str, country_code: str = countries['code']['default']) -> dict:
+
+def parse_response(response: dict,
+                   vat_number: str,
+                   country_code: str = countries['code']['default']) -> dict:
     r"""Parses the response and get the relevant fields.
 
     :param response: a data structure containing the SOAP response.
@@ -175,12 +192,14 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
             else:
                 trader_information['name'] = response['traderName']
 
-            if (response['traderStreet'] is None or response['traderCity'] is None
+            if (response['traderStreet'] is None
+                    or response['traderCity'] is None
                     or response['traderPostcode'] is None):
                 if response['traderAddress'] is None:
                     raise CannotGetTraderAddress
                 else:
-                    trader = parse_address_string(response['traderAddress'], response['countryCode'])
+                    trader = parse_address_string(response['traderAddress'],
+                                                  response['countryCode'])
                     trader_information['address'] = trader['address']
                     trader_information['city'] = trader['city']
                     trader_information['province'] = trader['province']
@@ -198,7 +217,9 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
 
     return trader_information
 
-def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
+
+def prettify_trader_information(
+        information: dict, country_code: str = countries['code']['default']):
     r"""Capitalize the first letter of each word in the fields.
 
     :param information: a data structure containing the trader information.
@@ -217,7 +238,11 @@ def prettify_trader_information(information: dict, country_code: str = countries
         information['address'] = string.capwords(information['address'])
         information['city'] = string.capwords(information['city'])
 
-def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=True, show_input=True) -> str:
+
+def pipeline(vat_number: str,
+             country_code: str = countries['code']['default'],
+             trader_information_pretty=True,
+             show_input=True) -> str:
     r"""Execute the pipeline.
 
     :param vat_number: the vat number identifier.

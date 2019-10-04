@@ -17,13 +17,13 @@ doc:
 	$(MAKE) -C docs html
 
 install:
-	pip install .
+	pip3 install .
 
 test:
 	python3 setup.py test
 
 uninstall:
-	pip uninstall get_vat_eu
+	pip3 uninstall get_vat_eu
 
 clean:
 	rm -rf build dist *.egg-info tests/benchmark-results
