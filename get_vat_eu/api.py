@@ -7,7 +7,7 @@ import re
 import zeep
 import json
 import string
-from .constants import (common_defaults, urls, countries)
+from .constants import (common_defaults, urls, vat, countries)
 from .exceptions import (
         ResponseIOError,
         ResponseVatNumberNotConforming,
@@ -25,7 +25,7 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     .. raises: zeep.exceptions.Fault or a built-in exception.
     """
 
-    client = zeep.Client(urls['ec check vat api'])
+    client = zeep.Client(urls['ec_check_vat_api'])
     response = client.service.checkVatApprox(country_code, vat_number)
 
     return response
@@ -47,14 +47,14 @@ def parse_address_string(address_string: str, country_code: str) -> dict:
     trader_information = dict()
 
     if country_code == 'IT':
-        if (address_string.endswith(countries['IT']['address string']['separator'])
-            and countries['IT']['address string']['separator'] in address_string[0:-1]):
+        if (address_string.endswith(countries['IT']['address_string']['separator'])
+            and countries['IT']['address_string']['separator'] in address_string[0:-1]):
 
             # Divide the original string in two parts. Ignore the final empty string.
-            buf = address_string.split(countries['IT']['address string']['separator'])[:-1]
+            buf = address_string.split(countries['IT']['address_string']['separator'])[:-1]
 
             # The address part is the first substring. Remove spaces around the string borders.
-            address_substring = buf[0].strip(countries['IT']['address string']['delimiter'])
+            address_substring = buf[0].strip(countries['IT']['address_string']['delimiter'])
 
             # Postal code, city, province.
             pc_cty_prv_substring = buf[1]
@@ -64,7 +64,7 @@ def parse_address_string(address_string: str, country_code: str) -> dict:
             # Remove empty substrings in case of unexpected address string formats.
             buf = list(filter(None,
                 pc_cty_prv_substring.strip(
-                    countries['IT']['address string']['delimiter']).split(countries['IT']['address string']['delimiter'])))
+                    countries['IT']['address_string']['delimiter']).split(countries['IT']['address_string']['delimiter'])))
 
             # We expect at least 3 elements: postal code, province and city.
             if len(buf) < 3:
@@ -75,12 +75,12 @@ def parse_address_string(address_string: str, country_code: str) -> dict:
             province = buf[-1]
             # A city might contain spaces (delimiters).
             # Always be tolerant with the delimiters on the borders.
-            city = countries['IT']['address string']['delimiter'].join(buf[1:-1]).strip(countries['IT']['address string']['delimiter'])
+            city = countries['IT']['address_string']['delimiter'].join(buf[1:-1]).strip(countries['IT']['address_string']['delimiter'])
 
             # Check that the province is composed of 2 uppercase letter characters.
             # Check that the postal code correponds to the standard.
-            if (not re.match("^\d{5}", postal_code)
-                or not re.match("^[A-Z]{2}$", province)):
+            if (not re.match(countries['IT']['post_code']['regex'], postal_code)
+                or not re.match(countries['IT']['province']['regex'], province)):
                 raise AddressStringNotCorrespondingToExpectedFormat
 
             trader_information['address'] = address_substring
@@ -97,9 +97,7 @@ def vat_adheres_to_specifications(vat_number: str, country_code: str = countries
     assert len(country_code) == 2
 
     vat_conforming = True
-
-    wikipedia_vat_regex = "((ATU|DK|FI|HU|LU|MT|SI)[0-9]{8}|(BE|BG)[0-9]{9,10}|(ES([0-9]|[A-Z])[0-9]{7}([A-Z]|[0-9]))|(HR|IT|LV)[0-9]{11}|CY[0-9]{8}[A-Z]|CZ[0-9]{8,10}|(DE|EE|EL|GB|PT)[0-9]{9}|FR[A-Z0-9]{2}[0-9]{8}[A-Z0-9]|IE[0-9]{7}[A-Z0-9]{2}|LT[0-9]{9}([0-9]{3})?|NL[0-9]{9}B([0-9]{2})|PL[0-9]{10}|RO[0-9]{2,10}|SK[0-9]{10}|SE[0-9]{12})"
-    if not re.match(wikipedia_vat_regex, country_code + vat_number):
+    if not re.match(vat['regex'], country_code + vat_number):
         vat_conforming = False
 
     return vat_conforming
@@ -174,8 +172,8 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
                 trader_information['city'] = response['traderCity']
                 trader_information['province'] = response['traderCity']
                 trader_information['post_code'] = response['traderPostCode']
-        # A generic country.
         else:
+            # A generic country.
             raise CountryCodeNotImplemented
     else:
         raise VatNotValid
