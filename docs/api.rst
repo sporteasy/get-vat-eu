@@ -17,7 +17,6 @@ output types.
 .. autofunction:: vat_adheres_to_specifications
 .. autofunction:: parse_response
 .. autofunction:: prettify_trader_information
-.. autofunction:: dict_to_json
 .. autofunction:: pipeline
 
 Exceptions

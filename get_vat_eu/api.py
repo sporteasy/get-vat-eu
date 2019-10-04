@@ -19,7 +19,7 @@ from .exceptions import (
         CountryCodeNotImplemented)
 
 
-def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
+def request_vat_information(vat_number: str, country_code: str = countries['code']['default']) -> dict:
     r"""Make a SOAP request and expect a response.
 
 
@@ -32,11 +32,11 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     return response
 
 
-def parse_address_string(address_string: str, country_code: str):
+def parse_address_string(address_string: str, country_code: str) -> dict:
     r"""Get relevant information from the address string.
 
     :param address_string: a string containing all the address information.
-    :param country_code: a two letter uppercase identifier.
+    :param country_code: a two letter uppercase country identifier.
     :type address_string: str
     :type country_code: str
     :returns: a data structure with keys differing from country code to country code.
@@ -93,19 +93,19 @@ def parse_address_string(address_string: str, country_code: str):
 
     return trader_information
 
-def vat_adheres_to_specifications(vat_number: str, country_code: str = countries['code']['default']):
+def vat_adheres_to_specifications(vat_number: str, country_code: str = countries['code']['default']) -> bool:
     """Chceck that the VAT number corresponds to the specifications."""
-    # TODO assertions
+    assert len(country_code) == 2
+
     vat_conforming = True
 
-    # https://it.wikipedia.org/wiki/Partita_IVA#Numeri_IVA_nell'Unione_europea
     wikipedia_vat_regex = "((ATU|DK|FI|HU|LU|MT|SI)[0-9]{8}|(BE|BG)[0-9]{9,10}|(ES([0-9]|[A-Z])[0-9]{7}([A-Z]|[0-9]))|(HR|IT|LV)[0-9]{11}|CY[0-9]{8}[A-Z]|CZ[0-9]{8,10}|(DE|EE|EL|GB|PT)[0-9]{9}|FR[A-Z0-9]{2}[0-9]{8}[A-Z0-9]|IE[0-9]{7}[A-Z0-9]{2}|LT[0-9]{9}([0-9]{3})?|NL[0-9]{9}B([0-9]{2})|PL[0-9]{10}|RO[0-9]{2,10}|SK[0-9]{10}|SE[0-9]{12})"
     if not re.match(wikipedia_vat_regex, country_code + vat_number):
         vat_conforming = False
 
     return vat_conforming
 
-def parse_response(response: dict, vat_number: str, country_code: str = countries['code']['default']):
+def parse_response(response: dict, vat_number: str, country_code: str = countries['code']['default']) -> dict:
     r"""Parses the response and get the relevant fields."""
     assert 'countryCode' in response
     assert 'vatNumber' in response
@@ -176,15 +176,30 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     return trader_information
 
 def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
-    # TODO: Assertions
+    """Capitalize the first letter of each word in the fields.
+
+    :param information: a data structure containing the trader information.
+    :param country_code: a two letter uppercase country identifier.
+    :type information: dict
+    :type country_code: str
+    :returns: None
+    :rtype: None
+    :raises: a built-in exception.
+    """
+    assert len(country_code) == 2
+
     if country_code == 'IT':
+        # TODO: Assertions
+
         information['address'] = string.capwords(information['address'])
         information['city'] = string.capwords(information['city'])
 
-def dict_to_json(information: dict):
-    return json.dumps(information)
+def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=True, show_input=True) -> str:
+    """Execute the pipeline.
 
-def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=True, show_input=True):
+    :returns: a string formatted according to JSON specifications.
+    :rtype: str
+    """
     response = request_vat_information(vat_number, country_code)
     trader_information = parse_response(response, vat_number, country_code)
     if trader_information_pretty:
@@ -192,4 +207,4 @@ def pipeline(vat_number: str, country_code: str = countries['code']['default'], 
     if show_input:
         trader_information['country_code'] = country_code
         trader_information['vat_number'] = vat_number
-    return dict_to_json(trader_information)
+    return json.dumps(trader_information)

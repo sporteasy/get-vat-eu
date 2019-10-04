@@ -16,8 +16,7 @@ Rules
 Address string
 ``````````````
 
-There is no apparent specification in this case. Rules are derived
-empirically.
+No specification was found in this case. Rules are derived empirically.
 
 ``IT``
 ~~~~~~
@@ -32,3 +31,8 @@ Postal code
 ```````````
 
 - https://publications.europa.eu/code/en/en-390105.htm
+
+VAT number
+``````````
+
+- https://it.wikipedia.org/wiki/Partita_IVA#Numeri_IVA_nell'Unione_europea
