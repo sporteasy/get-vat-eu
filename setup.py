@@ -17,7 +17,7 @@ setup(
     author='Franco Masotti',
     author_email='franco.masotti@live.com',
     keywords='vat ec eu',
-    url='https://github.com/frnmst/TODO',
+    url='https://github.com/TODO',
     python_requires='>=3.5, <4',
     entry_points={
         'console_scripts': [
@@ -33,6 +33,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 3',
     ],
-    install_requires=[''],
+    install_requires=['zeep==3'],
 )
 

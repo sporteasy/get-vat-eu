@@ -4,6 +4,9 @@
 
 """Exceptions file."""
 
+class ResponseIOError(Exception):
+    """Input and expected output differ."""
+
 class CannotGetTraderVatNumber(Exception):
     """The API does not know what the address."""
 

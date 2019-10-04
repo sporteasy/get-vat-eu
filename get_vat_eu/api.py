@@ -18,19 +18,17 @@ from .exceptions import (
         CountryCodeNotImplemented)
 
 
-# TODO handle exceptions:
-# TODO they get raised like this: zeep.exceptions.Fault: SERVICE_UNAVAILABLE
-"""
-    - INVALID_INPUT: The provided CountryCode is invalid or the VAT number is empty; 
+def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
+    r"""Make a SOAP request and expect a response.
+
+    zeep might raise exceptions like this: zeep.exceptions.Fault: SERVICE_UNAVAILABLE
+    - INVALID_INPUT: The provided CountryCode is invalid or the VAT number is empty;
     - GLOBAL_MAX_CONCURRENT_REQ: Your Request for VAT validation has not been processed; the maximum number of concurrent requests has been reached. Please re-submit your request later or contact TAXUD-VIESWEB@ec.europa.eu for further information": Your request cannot be processed due to high traffic on the web application. Please try again later; 
     - MS_MAX_CONCURRENT_REQ: Your Request for VAT validation has not been processed; the maximum number of concurrent requests for this Member State has been reached. Please re-submit your request later or contact TAXUD-VIESWEB@ec.europa.eu for further information": Your request cannot be processed due to high traffic towards the Member State you are trying to reach. Please try again later. 
     - SERVICE_UNAVAILABLE: an error was encountered either at the network level or the Web application level, try again later; 
     - MS_UNAVAILABLE: The application at the Member State is not replying or not available. Please refer to the Technical Information page to check the status of the requested Member State, try again later; 
     - TIMEOUT: The application did not receive a reply within the allocated time period, try again later. 
-"""
-
-def request_vat_information(vat_number: str, country_code: str = countries['code']['default']):
-    r"""Make a SOAP request and expect a response."""
+    """
 
     client = zeep.Client(urls['ec check vat api'])
     response = client.service.checkVatApprox(country_code, vat_number)
@@ -88,7 +86,7 @@ def parse_address_string(address_string: str, country_code: str):
                 raise AddressStringNotCorrespondingToExpectedFormat
 
             trader_information['address'] = address_substring
-            trader_information['post code'] = postal_code
+            trader_information['post_code'] = postal_code
             trader_information['province'] = province
             trader_information['city'] = city
         else:
@@ -126,7 +124,7 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     assert 'traderPostcodeMatch' in response
     assert 'traderCityMatch' in response
     assert 'requestIdentifier' in response
-    # These variables must be defined.
+    # The following variables must be defined.
     assert response['countryCode'] is not None
     assert response['vatNumber'] is not None
     assert response['requestDate'] is not None
@@ -134,13 +132,9 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     assert isinstance(response['valid'], bool)
 
     if response['countryCode'] != country_code:
-        pass
-        # TODO
-
+        raise ResponseIOError
     if response['vatNumber'] != vat_number:
-        pass
-        # TODO
-
+        raise ResponseIOError
 
     trader_information = dict()
 
@@ -168,12 +162,12 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
                     trader_information['address'] = trader['address']
                     trader_information['city'] = trader['city']
                     trader_information['province'] = trader['province']
-                    trader_information['post code'] = trader['post code']
+                    trader_information['post_code'] = trader['post_code']
             else:
                 trader_information['address'] = trader['address']
                 trader_information['city'] = response['traderCity']
                 trader_information['province'] = response['traderCity']
-                trader_information['post code'] = response['traderPostCode']
+                trader_information['post_code'] = response['traderPostCode']
         # A generic country.
         else:
             raise CountryCodeNotImplemented
@@ -185,16 +179,19 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
 def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
     # TODO: Assertions
     if country_code == 'IT':
-        information['name'] = string.capwords(information['name'])
+        # information['name'] = string.capwords(information['name'])
         information['address'] = string.capwords(information['address'])
         information['city'] = string.capwords(information['city'])
 
 def dict_to_json(information: dict):
     return json.dumps(information)
 
-def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=False):
+def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=True, show_input=True):
     response = request_vat_information(vat_number, country_code)
     trader_information = parse_response(response, vat_number, country_code)
     if trader_information_pretty:
         prettify_trader_information(trader_information, country_code)
+    if show_input:
+        trader_information['country_code'] = country_code
+        trader_information['vat_number'] = vat_number
     return dict_to_json(trader_information)
