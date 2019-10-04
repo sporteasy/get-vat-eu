@@ -21,8 +21,13 @@ from .exceptions import (
 def request_vat_information(vat_number: str, country_code: str = countries['code']['default']) -> dict:
     r"""Make a SOAP request and expect a response.
 
-
-    .. raises: zeep.exceptions.Fault or a built-in exception.
+    :param vat_number: the vat number identifier.
+    :param country_code: a two letter uppercase country identifier.
+    :type vat_number: str
+    :type country_code: str
+    :returns: a data structure containing the SOAP response.
+    :rtype: dict
+    :raises: zeep.exceptions.Fault or a built-in exception.
     """
 
     client = zeep.Client(urls['ec_check_vat_api'])
@@ -31,7 +36,7 @@ def request_vat_information(vat_number: str, country_code: str = countries['code
     return response
 
 
-def parse_address_string(address_string: str, country_code: str) -> dict:
+def parse_address_string(address_string: str, country_code: str = countries['code']['default']) -> dict:
     r"""Get relevant information from the address string.
 
     :param address_string: a string containing all the address information.
@@ -93,12 +98,21 @@ def parse_address_string(address_string: str, country_code: str) -> dict:
     return trader_information
 
 def vat_adheres_to_specifications(vat_number: str, country_code: str = countries['code']['default']) -> bool:
-    """Chceck that the VAT number corresponds to the specifications."""
+    r"""Check that the VAT number corresponds to the specifications.
+
+    :param vat_number: the vat number identifier.
+    :param country_code: a two letter uppercase country identifier.
+    :type vat_number: str
+    :type country_code: str
+    :returns: ``True`` if the VAT number adheres to the specifications, ``False`` otherwise.
+    :rtype: bool
+    :raises: a built-in exception.
+    """
     assert len(country_code) == 2
 
-    vat_conforming = True
-    if not re.match(vat['regex'], country_code + vat_number):
-        vat_conforming = False
+    vat_conforming = False
+    if re.match(vat['regex'], country_code + vat_number):
+        vat_conforming = True
 
     return vat_conforming
 
@@ -106,12 +120,15 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     r"""Parses the response and get the relevant fields.
 
     :param response: a data structure containing the SOAP response.
+    :param vat_number: the vat number identifier.
     :param country_code: a two letter uppercase country identifier.
     :type response: dict
+    :type vat_number: str
     :type country_code: str
     :returns: a data structure with keys differing from country code to country code.
     :rtype: dict
-    :raises: ResponseIOError, ResponseVatNumberNotConforming or a built-in exception.
+    :raises: ResponseIOError, ResponseVatNumberNotConforming, CannotGetTraderName,
+        CannotGetTraderAddress, CountryCodeNotImplemented, VatNotValid, or a built-in exception.
     """
     assert 'countryCode' in response
     assert 'vatNumber' in response
@@ -135,6 +152,7 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     assert response['requestDate'] is not None
     assert response['valid'] is not None
     assert isinstance(response['valid'], bool)
+    assert isinstance(response['countryCode'], str)
     assert isinstance(response['vatNumber'], str)
 
     if response['countryCode'] != country_code:
@@ -181,7 +199,7 @@ def parse_response(response: dict, vat_number: str, country_code: str = countrie
     return trader_information
 
 def prettify_trader_information(information: dict, country_code: str = countries['code']['default']):
-    """Capitalize the first letter of each word in the fields.
+    r"""Capitalize the first letter of each word in the fields.
 
     :param information: a data structure containing the trader information.
     :param country_code: a two letter uppercase country identifier.
@@ -200,16 +218,27 @@ def prettify_trader_information(information: dict, country_code: str = countries
         information['city'] = string.capwords(information['city'])
 
 def pipeline(vat_number: str, country_code: str = countries['code']['default'], trader_information_pretty=True, show_input=True) -> str:
-    """Execute the pipeline.
+    r"""Execute the pipeline.
 
+    :param vat_number: the vat number identifier.
+    :param country_code: a two letter uppercase country identifier.
+    :param trader_information_pretty: change the capitalization
+        of the elements to something more human readable.
+    :param show_input: return the country code and the
+        vat number along with the normal output.
+    :type vat_number: str
+    :type country_code: str
+    :type trader_information_pretty: bool
+    :type show_input: bool
     :returns: a string formatted according to JSON specifications.
     :rtype: str
+    :raises: a built-in exception.
     """
     response = request_vat_information(vat_number, country_code)
     trader_information = parse_response(response, vat_number, country_code)
     if trader_information_pretty:
         prettify_trader_information(trader_information, country_code)
     if show_input:
-        trader_information['country_code'] = country_code
         trader_information['vat_number'] = vat_number
+        trader_information['country_code'] = country_code
     return json.dumps(trader_information)
