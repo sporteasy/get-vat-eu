@@ -10,7 +10,7 @@ Introduction
 Structure
 ---------
 
-String returned by the pipeline function
+Object returned by the pipeline function
 ````````````````````````````````````````
 
 ``IT``
