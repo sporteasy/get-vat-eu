@@ -24,7 +24,6 @@
 
 import re
 import zeep
-import json
 import string
 from .constants import (common_defaults, urls, vat, countries)
 from .exceptions import (
@@ -274,8 +273,8 @@ def pipeline(vat_number: str,
     :type country_code: str
     :type trader_information_pretty: bool
     :type show_input: bool
-    :returns: a string formatted according to JSON specifications.
-    :rtype: str
+    :returns: a data structure with all the relevant fields.
+    :rtype: dict
     :raises: a built-in exception.
     """
     response = request_vat_information(vat_number, country_code)
@@ -285,4 +284,4 @@ def pipeline(vat_number: str,
     if show_input:
         trader_information['vat_number'] = vat_number
         trader_information['country_code'] = country_code
-    return json.dumps(trader_information, indent=4, sort_keys=True)
+    return trader_information
