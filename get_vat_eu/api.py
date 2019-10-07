@@ -27,6 +27,7 @@ import zeep
 import string
 from .constants import (common_defaults, urls, vat, countries)
 from .exceptions import (
+    VIESServiceError,
     ResponseIOError, ResponseVatNumberNotConforming, CannotGetTraderName,
     CannotGetTraderAddress, VatNotValid,
     AddressStringNotCorrespondingToExpectedFormat, CountryCodeNotImplemented)
@@ -43,11 +44,13 @@ def request_vat_information(vat_number: str,
     :type country_code: str
     :returns: a data structure containing the SOAP response.
     :rtype: dict
-    :raises: zeep.exceptions.Fault or a built-in exception.
+    :raises: VIESServiceError or a built-in exception.
     """
-
-    client = zeep.Client(urls['ec_check_vat_api'])
-    response = client.service.checkVatApprox(country_code, vat_number)
+    try:
+        client = zeep.Client(urls['ec_check_vat_api'])
+        response = client.service.checkVatApprox(country_code, vat_number)
+    except zeep.exceptions.Fault:
+        raise VIESServiceError
 
     return response
 
@@ -250,8 +253,8 @@ def prettify_trader_information(
     """
     assert len(country_code) == 2
     if country_code == 'IT':
-        assert address in information
-        assert city in information
+        assert 'address' in information
+        assert 'city' in information
         assert isinstance(information['address'], str)
         assert isinstance(information['city'], str)
 

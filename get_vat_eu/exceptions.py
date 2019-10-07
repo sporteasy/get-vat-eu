@@ -23,6 +23,8 @@
 
 """Exceptions file."""
 
+class VIESServiceError(Exception):
+    """The remote API is fauly for some reason."""
 
 class ResponseIOError(Exception):
     """Input and expected output differ."""
