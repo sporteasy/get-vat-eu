@@ -10,8 +10,11 @@ Welcome to get-vat-eu's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   install
    api
    specifications
+   contributing
+   copyright_license
 
 Indices and tables
 ==================
