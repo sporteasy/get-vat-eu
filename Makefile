@@ -25,6 +25,13 @@ test:
 uninstall:
 	pip3 uninstall get_vat_eu
 
+dist:
+	python setup.py sdist
+	python setup.py bdist_wheel
+
+upload:
+	twine upload dist/*
+
 clean:
 	rm -rf build dist *.egg-info tests/benchmark-results
 
