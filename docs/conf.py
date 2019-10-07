@@ -17,12 +17,14 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'get-vat-eu'
-copyright = '2019, Franco Masotti'
-author = 'Franco Masotti'
+copyright = '2019, CityCommerce srl'
+author = 'CityCommerce srl'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
 
+# The master toctree document.
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
@@ -56,3 +58,29 @@ html_static_path = ['_static']
 
 
 # -- Extension configuration -------------------------------------------------
+
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+#
+html_theme_options = {
+    'github_user': 'citycommerce',
+    'github_repo': 'get-vat-eu',
+    'github_banner': True,
+}
+
+
+# Custom sidebar templates, must be a dictionary that maps document names
+# to template names.
+#
+# This is required for the alabaster theme
+# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html',
+        'donate.html',
+    ]
+}
