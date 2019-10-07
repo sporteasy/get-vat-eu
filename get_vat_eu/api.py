@@ -249,10 +249,13 @@ def prettify_trader_information(
     :raises: a built-in exception.
     """
     assert len(country_code) == 2
+    if country_code == 'IT':
+        assert address in information
+        assert city in information
+        assert isinstance(information['address'], str)
+        assert isinstance(information['city'], str)
 
     if country_code == 'IT':
-        # TODO: Assertions
-
         information['address'] = string.capwords(information['address'])
         information['city'] = string.capwords(information['city'])
 
