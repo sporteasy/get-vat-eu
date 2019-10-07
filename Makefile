@@ -44,8 +44,8 @@ uninstall:
 	pip3 uninstall get_vat_eu
 
 dist:
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python3 setup.py sdist
+	python3 setup.py bdist_wheel
 
 upload:
 	twine upload dist/*
