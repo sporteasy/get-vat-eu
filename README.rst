@@ -14,7 +14,7 @@ Description
 This library parsers the elements returned by the VIES SOAP API of the 
 European Commission. The trader address field usually contains all the needed
 information and needs to be separated into various elements such as the city,
-postal code, address and house number, etc...
+postal code, address and house number, etc... This is what this library does.
 
 Documentation
 -------------
@@ -24,7 +24,27 @@ https://citycommerce.github.io/get-vat-eu
 API examples
 ------------
 
-TODO
+get-vat-eu has a `public API`_. This means for example that you can you easily get
+all trader information like this:
+
+
+::
+
+
+    >> import get_vat_eu
+    >> print(get_vat_eu.pipeline('01561700293', 'IT'))
+    {
+        "address": "Viale Porta Adige 45",
+        "city": "Rovigo",
+        "country_code": "IT",
+        "name": "CITYCOMMERCE SRL",
+        "post_code": "45100",
+        "province": "RO",
+        "vat_number": "01561700293"
+    }
+
+
+.. _public API: https://citycommerce.github.io/get-vat-eu/api.html
 
 CLI Helps
 ---------
