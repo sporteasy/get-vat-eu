@@ -27,9 +27,8 @@ import zeep
 import string
 from .constants import (common_defaults, urls, vat, countries)
 from .exceptions import (
-    VIESServiceError,
-    ResponseIOError, ResponseVatNumberNotConforming, CannotGetTraderName,
-    CannotGetTraderAddress, VatNotValid,
+    VIESServiceError, ResponseIOError, ResponseVatNumberNotConforming,
+    CannotGetTraderName, CannotGetTraderAddress, VatNotValid,
     AddressStringNotCorrespondingToExpectedFormat, CountryCodeNotImplemented)
 
 
