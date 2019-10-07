@@ -19,15 +19,7 @@ Object returned by the pipeline function
 ::
 
 
-    {
-        "address": "${full address}",
-        "city": "${city}",
-        "country_code": "IT",
-        "name": "${name}",
-        "post_code": "${post code}",
-        "province": "${province}",
-        "vat_number": "${vat number}"
-    }
+    {'name': '${name}', 'address': '${full address}', 'city': '${city}', 'province': '${province}', 'post_code': '${post code}', 'vat_number': '${vat number}', 'country_code': 'IT'}
 
 
 Rules

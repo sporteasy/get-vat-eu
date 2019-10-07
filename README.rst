@@ -33,16 +33,7 @@ all trader information like this:
 
     >> import get_vat_eu
     >> print(get_vat_eu.pipeline('01561700293', 'IT'))
-    {
-        "address": "Viale Porta Adige 45",
-        "city": "Rovigo",
-        "country_code": "IT",
-        "name": "CITYCOMMERCE SRL",
-        "post_code": "45100",
-        "province": "RO",
-        "vat_number": "01561700293"
-    }
-
+    {'name': 'CITYCOMMERCE SRL', 'address': 'Viale Porta Adige 45', 'city': 'Rovigo', 'province': 'RO', 'post_code': '45100', 'vat_number': '01561700293', 'country_code': 'IT'}
 
 .. _public API: https://citycommerce.github.io/get-vat-eu/api.html
 
