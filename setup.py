@@ -25,7 +25,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='get_vat_eu',
-    version='0.0.1',
+    version='1.0.0',
     packages=find_packages(exclude=['*tests*']),
     license='MIT',
     description='A utility that is able to get and parse EU EC VATs.',
@@ -33,7 +33,7 @@ setup(
     package_data={
         '': ['*.txt', '*.rst'],
     },
-    author='CityCommerce',
+    author='CityCommerce srl',
     author_email='citycommercedev@gmail.com',
     keywords='vat ec eu',
     url='https://github.com/citycommerce/get-vat-eu',
