@@ -1,12 +1,24 @@
 Get VAT EU
 ==========
 
+
+|pypiver|    |license|    |pyver|    |downloads|
+
+.. |pypiver| image:: https://img.shields.io/pypi/v/get-vat-eu.svg
+               :alt: PyPI get-vat-eu version
+ 
+.. |license| image:: https://img.shields.io/pypi/l/get-vat-eu.svg?color=blue
+               :alt: PyPI - License
+               :target: https://raw.githubusercontent.com/frnmst/get-vat-eu/master/LICENSE.txt
+
+.. |pyver| image:: https://img.shields.io/pypi/pyversions/get-vat-eu.svg
+             :alt: PyPI - Python Version
+
+.. |downloads| image:: https://pepy.tech/badge/get-vat-eu
+                 :alt: Downloads
+                 :target: https://pepy.tech/project/get-vat-eu
+
 A utility that is able to get and parse EU EC VATs.
-
-Video
------
-
-TODO
 
 Description
 -----------
@@ -36,11 +48,6 @@ all trader information like this:
     {'name': 'CITYCOMMERCE SRL', 'address': 'Viale Porta Adige 45', 'city': 'Rovigo', 'province': 'RO', 'post_code': '45100', 'vat_number': '01561700293', 'country_code': 'IT'}
 
 .. _public API: https://citycommerce.github.io/get-vat-eu/api.html
-
-CLI Helps
----------
-
-TODO
 
 License
 -------
