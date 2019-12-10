@@ -25,7 +25,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='get_vat_eu',
-    version='1.0.0',
+    version='1.0.1',
     packages=find_packages(exclude=['*tests*']),
     license='MIT',
     description='A utility that is able to get and parse EU EC VATs.',
