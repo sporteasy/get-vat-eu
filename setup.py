@@ -52,6 +52,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
-    install_requires=['zeep==3'],
+    install_requires=['zeep>=3.0.0'],
 )
 
